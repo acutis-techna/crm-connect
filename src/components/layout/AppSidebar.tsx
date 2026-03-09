@@ -33,7 +33,7 @@ export function AppSidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-primary">
               <BarChart3 className="h-4 w-4 text-sidebar-primary-foreground" />
             </div>
-            <span className="text-sm font-semibold text-sidebar-accent-foreground">MiniCRM</span>
+            <span className="text-sm font-semibold text-sidebar-accent-foreground">TechnaCRM</span>
           </div>
         )}
         <button
