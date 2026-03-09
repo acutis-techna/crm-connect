@@ -50,7 +50,7 @@ export default function Auth() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
             <BarChart3 className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl">MiniCRM</CardTitle>
+          <CardTitle className="text-2xl">TechnaCRM</CardTitle>
           <CardDescription>
             {isLogin ? "Entre na sua conta" : "Crie sua conta"}
           </CardDescription>
