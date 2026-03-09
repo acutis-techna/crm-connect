@@ -138,6 +138,19 @@ export default function SettingsPage() {
     },
   });
 
+  const renameStage = useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      const { error } = await supabase.from("stages").update({ name }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-stages"] });
+      queryClient.invalidateQueries({ queryKey: ["stages"] });
+      toast.success("Stage renomeado!");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   return (
     <>
       <TopBar title="Configurações" />
