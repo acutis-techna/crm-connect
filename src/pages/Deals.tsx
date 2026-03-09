@@ -83,7 +83,7 @@ export default function Deals() {
 
   return (
     <>
-      <TopBar title="Pipeline">
+      <TopBar title="Negociações">
         <div className="flex items-center gap-2">
           {pipelines.length > 1 && (
             <Select value={activePipelineId} onValueChange={setSelectedPipeline}>
