@@ -149,7 +149,7 @@ export default function SettingsPage() {
                         <div key={s.id} className="flex items-center justify-between rounded-md border px-3 py-2">
                           <div className="flex items-center gap-2">
                             <GripVertical className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{s.name}</span>
+                            <EditableStageName stage={s} onRename={renameStage.mutate} />
                             <span className="text-xs text-muted-foreground">({s.probability}%)</span>
                           </div>
                           <button onClick={() => deleteStage.mutate(s.id)} className="rounded p-1 hover:bg-destructive/10 text-destructive">
