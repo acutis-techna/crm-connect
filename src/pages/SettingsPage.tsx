@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccountId } from "@/hooks/useAccountId";
@@ -10,8 +10,47 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
+
+function EditableStageName({ stage, onRename }: { stage: { id: string; name: string }; onRename: (args: { id: string; name: string }) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(stage.name);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+
+  const save = () => {
+    const trimmed = value.trim();
+    if (trimmed && trimmed !== stage.name) {
+      onRename({ id: stage.id, name: trimmed });
+    } else {
+      setValue(stage.name);
+    }
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <form onSubmit={(e) => { e.preventDefault(); save(); }} className="flex items-center gap-1">
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={save}
+          className="h-6 w-28 rounded border border-input bg-background px-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        />
+      </form>
+    );
+  }
+
+  return (
+    <button onClick={() => setEditing(true)} className="group flex items-center gap-1 text-sm hover:text-primary">
+      {stage.name}
+      <Pencil className="h-3 w-3 opacity-0 group-hover:opacity-60" />
+    </button>
+  );
+}
 
 export default function SettingsPage() {
   const accountId = useAccountId();
@@ -99,6 +138,19 @@ export default function SettingsPage() {
     },
   });
 
+  const renameStage = useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      const { error } = await supabase.from("stages").update({ name }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-stages"] });
+      queryClient.invalidateQueries({ queryKey: ["stages"] });
+      toast.success("Stage renomeado!");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   return (
     <>
       <TopBar title="Configurações" />
@@ -149,7 +201,7 @@ export default function SettingsPage() {
                         <div key={s.id} className="flex items-center justify-between rounded-md border px-3 py-2">
                           <div className="flex items-center gap-2">
                             <GripVertical className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{s.name}</span>
+                            <EditableStageName stage={s} onRename={renameStage.mutate} />
                             <span className="text-xs text-muted-foreground">({s.probability}%)</span>
                           </div>
                           <button onClick={() => deleteStage.mutate(s.id)} className="rounded p-1 hover:bg-destructive/10 text-destructive">
